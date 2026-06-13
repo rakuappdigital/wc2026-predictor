@@ -84,6 +84,9 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/groups" className="text-gray-400 hover:text-white text-sm transition-colors">
+              👥 Gruplar
+            </Link>
             <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
               🏆 Sıralama
             </Link>

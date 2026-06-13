@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 interface Match {
@@ -29,26 +30,27 @@ interface Props {
 }
 
 export default function MatchCard({ match, prediction, userId }: Props) {
-  const [homePred, setHomePred] = useState(prediction?.home_pred ?? '')
-  const [awayPred, setAwayPred] = useState(prediction?.away_pred ?? '')
+  const router = useRouter()
+  const [homePred, setHomePred] = useState('')
+  const [awayPred, setAwayPred] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(!!prediction)
 
   const kickoff = new Date(match.kickoff_time)
   const isPast = kickoff < new Date()
-  const canPredict = !isPast && userId && match.status === 'upcoming'
+  const canPredict = !isPast && userId && match.status === 'upcoming' && !prediction
 
   async function savePrediction() {
     if (!userId || homePred === '' || awayPred === '') return
     setSaving(true)
-    await supabase.from('predictions').upsert({
+    const { error } = await supabase.from('predictions').insert({
       user_id: userId,
       match_id: match.id,
       home_pred: Number(homePred),
       away_pred: Number(awayPred),
-    }, { onConflict: 'user_id,match_id' })
+    })
     setSaving(false)
-    setSaved(true)
+    if (!error) setSaved(true)
   }
 
   const statusBadge = {
@@ -57,8 +59,14 @@ export default function MatchCard({ match, prediction, userId }: Props) {
     finished: { label: 'Bitti', color: 'bg-gray-600' },
   }[match.status] ?? { label: match.status, color: 'bg-gray-600' }
 
+  const hasPrediction = saved || !!prediction
+  const isClickable = hasPrediction || match.status !== 'upcoming'
+
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-gray-600 transition-colors">
+    <div
+      className={`bg-gray-900 border border-gray-800 rounded-2xl p-5 transition-colors ${isClickable ? 'hover:border-gray-600 cursor-pointer' : ''}`}
+      onClick={isClickable ? () => router.push(`/match/${match.id}`) : undefined}
+    >
       <div className="flex justify-between items-center mb-4">
         <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${statusBadge.color}`}>
           {statusBadge.label}
@@ -96,7 +104,7 @@ export default function MatchCard({ match, prediction, userId }: Props) {
 
       {/* Tahmin bölümü */}
       {userId && (
-        <div className="mt-4 pt-4 border-t border-gray-800">
+        <div className="mt-4 pt-4 border-t border-gray-800" onClick={e => e.stopPropagation()}>
           {prediction?.calculated ? (
             <div className="text-center">
               <p className="text-gray-400 text-sm">Tahminin: {prediction.home_pred} - {prediction.away_pred}</p>
@@ -104,16 +112,27 @@ export default function MatchCard({ match, prediction, userId }: Props) {
                 +{prediction.points_earned} puan
               </p>
             </div>
+          ) : prediction && !prediction.calculated ? (
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">Tahminin: {prediction.home_pred} - {prediction.away_pred}</p>
+              <p className="text-gray-500 text-xs mt-1">Maç bekleniyor</p>
+            </div>
+          ) : saved ? (
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">Tahminin: {homePred} - {awayPred}</p>
+              <p className="text-green-500 text-xs mt-1">✓ Kaydedildi — arkadaşların tahminlerini görmek için tıkla</p>
+            </div>
           ) : canPredict ? (
             <div>
-              <p className="text-gray-400 text-xs mb-2 text-center">Tahminin</p>
+              <p className="text-gray-400 text-xs mb-2 text-center">Tahminini gir (bir kez kaydedilir, değiştirilemez)</p>
               <div className="flex items-center gap-3 justify-center">
                 <input
                   type="number"
                   min="0"
                   max="20"
                   value={homePred}
-                  onChange={e => { setHomePred(e.target.value); setSaved(false) }}
+                  onChange={e => setHomePred(e.target.value)}
+                  placeholder="0"
                   className="w-14 text-center bg-gray-800 text-white border border-gray-700 rounded-lg py-2 text-lg font-bold focus:border-green-500 focus:outline-none"
                 />
                 <span className="text-gray-500 font-bold">-</span>
@@ -122,22 +141,21 @@ export default function MatchCard({ match, prediction, userId }: Props) {
                   min="0"
                   max="20"
                   value={awayPred}
-                  onChange={e => { setAwayPred(e.target.value); setSaved(false) }}
+                  onChange={e => setAwayPred(e.target.value)}
+                  placeholder="0"
                   className="w-14 text-center bg-gray-800 text-white border border-gray-700 rounded-lg py-2 text-lg font-bold focus:border-green-500 focus:outline-none"
                 />
                 <button
                   onClick={savePrediction}
-                  disabled={saving || saved}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${saved ? 'bg-green-900 text-green-400' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                  disabled={saving || homePred === '' || awayPred === ''}
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white disabled:opacity-40"
                 >
-                  {saving ? '...' : saved ? '✓ Kaydedildi' : 'Kaydet'}
+                  {saving ? '...' : 'Kaydet'}
                 </button>
               </div>
             </div>
           ) : isPast && !prediction ? (
             <p className="text-center text-gray-600 text-sm">Tahmin süresi geçti</p>
-          ) : prediction && !prediction.calculated ? (
-            <p className="text-center text-gray-400 text-sm">Tahminin: {prediction.home_pred} - {prediction.away_pred} (bekleniyor)</p>
           ) : null}
         </div>
       )}
