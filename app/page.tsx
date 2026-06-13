@@ -196,7 +196,7 @@ export default function Home() {
 
         {/* Tur sekmeleri */}
         <div className="flex justify-between items-center mb-5">
-          <div className="flex gap-24 flex-wrap">
+          <div className="flex flex-wrap" style={{ gap: '96px' }}>
             {([1, 2, 3, 'live'] as const).map(r => (
               <button
                 key={r}
