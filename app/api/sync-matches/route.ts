@@ -12,19 +12,21 @@ export async function GET() {
     const data = await fetchWC2026Matches()
     const matches = data.matches
 
-    const rows = matches.map((m: any) => ({
-      api_id: m.id,
-      home_team: m.homeTeam.name,
-      away_team: m.awayTeam.name,
-      home_team_flag: m.homeTeam.crest,
-      away_team_flag: m.awayTeam.crest,
-      kickoff_time: m.utcDate,
-      home_score: m.score?.fullTime?.home ?? null,
-      away_score: m.score?.fullTime?.away ?? null,
-      status: m.status === 'FINISHED' ? 'finished' : m.status === 'IN_PLAY' ? 'live' : 'upcoming',
-      matchday: m.matchday,
-      stage: m.stage,
-    }))
+    const rows = matches
+      .filter((m: any) => m.homeTeam?.name && m.awayTeam?.name)
+      .map((m: any) => ({
+        api_id: m.id,
+        home_team: m.homeTeam.name,
+        away_team: m.awayTeam.name,
+        home_team_flag: m.homeTeam.crest ?? null,
+        away_team_flag: m.awayTeam.crest ?? null,
+        kickoff_time: m.utcDate,
+        home_score: m.score?.fullTime?.home ?? null,
+        away_score: m.score?.fullTime?.away ?? null,
+        status: m.status === 'FINISHED' ? 'finished' : m.status === 'IN_PLAY' ? 'live' : 'upcoming',
+        matchday: m.matchday,
+        stage: m.stage,
+      }))
 
     const { error } = await supabaseAdmin
       .from('matches')
