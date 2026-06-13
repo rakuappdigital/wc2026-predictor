@@ -7,6 +7,7 @@ import Link from 'next/link'
 export default function MatchDetail() {
   const { id } = useParams()
   const [match, setMatch] = useState<any>(null)
+  const [liveStats, setLiveStats] = useState<any>(null)
   const [myPrediction, setMyPrediction] = useState<any>(null)
   const [groupPredictions, setGroupPredictions] = useState<any[]>([])
   const [userId, setUserId] = useState<string | null>(null)
@@ -23,6 +24,14 @@ export default function MatchDetail() {
         .eq('id', id)
         .single()
       setMatch(matchData)
+
+      // Gol ve kart verilerini doğrudan API'den çek
+      if (matchData?.api_id && matchData?.status !== 'upcoming') {
+        fetch(`/api/match-detail/${matchData.api_id}`)
+          .then(r => r.json())
+          .then(stats => { if (!stats.error) setLiveStats(stats) })
+          .catch(() => {})
+      }
 
       if (uid) {
         const { data: myPred } = await supabase
@@ -94,13 +103,10 @@ export default function MatchDetail() {
   }
   const statusBadge = statusMap[match.status] ?? { label: match.status, color: 'bg-gray-600' }
 
-  const goals: any[] = match.goals ?? []
-  const bookings: any[] = match.bookings ?? []
-  const homeGoals = goals.filter((g: any) => g.team?.id === goals[0]?.team?.id ? false : false) // aşağıda düzgün yapıyoruz
+  const goals: any[] = liveStats?.goals ?? match.goals ?? []
+  const bookings: any[] = liveStats?.bookings ?? match.bookings ?? []
   const yellowCards = bookings.filter((b: any) => b.card === 'YELLOW_CARD')
   const redCards = bookings.filter((b: any) => b.card === 'RED_CARD')
-
-  // Golleri takıma göre ayır
   const allGoals = goals.map((g: any) => ({
     minute: g.minute,
     name: g.scorer?.name ?? 'Bilinmiyor',
