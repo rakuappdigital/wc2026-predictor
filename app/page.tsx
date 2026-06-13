@@ -18,6 +18,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [roundFilter, setRoundFilter] = useState<number | 'live'>(1)
   const [syncing, setSyncing] = useState(false)
+  const [finishedOpen, setFinishedOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -94,9 +95,11 @@ export default function Home() {
   const needsLeagueSelection = hasGroups && !activeGroupId
 
   const liveMatches = matches.filter(m => m.status === 'live')
-  const filteredMatches = roundFilter === 'live'
+  const roundMatches = roundFilter === 'live'
     ? liveMatches
     : matches.filter(m => m.matchday === roundFilter)
+  const filteredMatches = roundMatches.filter(m => m.status !== 'finished')
+  const finishedMatches = roundMatches.filter(m => m.status === 'finished')
 
   const roundLabel = (r: number | 'live') => {
     if (r === 'live') return `🔴 Canlı${liveMatches.length > 0 ? ` (${liveMatches.length})` : ''}`
@@ -112,7 +115,7 @@ export default function Home() {
           <Link href="/" className="flex items-center gap-2.5">
             <span className="text-2xl">🏆</span>
             <div>
-              <p className="font-black text-base leading-none tracking-tight" style={{ color: 'var(--text)' }}>WC 2026</p>
+              <p className="font-black text-base leading-none tracking-tight" style={{ color: 'var(--text)' }}>#biroluruz</p>
               <p className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>Tahmin Oyunu</p>
             </div>
           </Link>
@@ -193,12 +196,12 @@ export default function Home() {
 
         {/* Tur sekmeleri */}
         <div className="flex justify-between items-center mb-5">
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-3 flex-wrap">
             {([1, 2, 3, 'live'] as const).map(r => (
               <button
                 key={r}
                 onClick={() => setRoundFilter(r)}
-                className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 style={roundFilter === r
                   ? { background: 'var(--green)', color: '#fff' }
                   : { background: 'var(--bg-card)', color: 'var(--text-muted)', border: '1px solid var(--border)' }
@@ -225,7 +228,7 @@ export default function Home() {
 
         {loading ? (
           <div className="text-center py-24" style={{ color: 'var(--text-muted)' }}>Yükleniyor...</div>
-        ) : filteredMatches.length === 0 ? (
+        ) : filteredMatches.length === 0 && finishedMatches.length === 0 ? (
           <div className="text-center py-24">
             <p className="mb-4" style={{ color: 'var(--text-muted)' }}>
               {roundFilter === 'live' ? 'Şu an canlı maç yok.' : `${roundFilter}. tur maçları yüklenmedi.`}
@@ -249,6 +252,47 @@ export default function Home() {
                 canPredict={!needsLeagueSelection}
               />
             ))}
+
+            {finishedMatches.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setFinishedOpen(o => !o)}
+                  className="w-full rounded-2xl border flex items-center justify-between px-5 py-4 transition-all hover:border-theme2"
+                  style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: 'var(--text-muted)' }} />
+                    <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
+                      Biten Maçlar
+                    </span>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: 'var(--bg-card2)', color: 'var(--text-muted)' }}>
+                      {finishedMatches.length}
+                    </span>
+                  </div>
+                  <svg
+                    width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                    className="transition-transform duration-200"
+                    style={{ color: 'var(--text-muted)', transform: finishedOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+
+                {finishedOpen && (
+                  <div className="grid gap-3 mt-3">
+                    {finishedMatches.map(match => (
+                      <MatchCard
+                        key={match.id}
+                        match={match}
+                        prediction={predictions.find(p => p.match_id === match.id)}
+                        userId={user.id}
+                        canPredict={!needsLeagueSelection}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </main>

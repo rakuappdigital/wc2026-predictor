@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "WC 2026 Tahmin",
+  title: "#biroluruz",
   description: "Dünya Kupası 2026 Tahmin Oyunu",
 };
 
