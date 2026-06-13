@@ -36,6 +36,13 @@ export default function Groups() {
     if (!userId || !groupName.trim()) return
     setCreating(true)
     setError('')
+
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('profiles').upsert({
+      id: userId,
+      username: user?.email ? user.email.split('@')[0] : userId.slice(0, 8),
+    }, { onConflict: 'id' })
+
     const { data, error } = await supabase
       .from('groups')
       .insert({ name: groupName.trim(), created_by: userId })
