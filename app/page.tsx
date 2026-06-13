@@ -94,7 +94,7 @@ export default function Home() {
             <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
               🏆 Sıralama
             </Link>
-            <div className="flex items-center gap-2">
+            <Link href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               {profile?.avatar && (
                 <img src={`/avatars/${profile.avatar}.svg`} alt="" className="w-9 h-9 rounded-full border border-gray-700" />
               )}
@@ -102,7 +102,7 @@ export default function Home() {
                 <p className="text-sm font-semibold">{profile?.username}</p>
                 <p className="text-green-400 text-xs font-bold">{profile?.total_points ?? 0} puan</p>
               </div>
-            </div>
+            </Link>
             <button onClick={signOut} className="text-gray-500 hover:text-white text-sm transition-colors">
               Çıkış
             </button>
