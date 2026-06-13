@@ -14,16 +14,11 @@ export default function AuthForm() {
     e.preventDefault()
     setLoading(true)
     setMessage('')
-
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) setMessage(error.message)
     } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { username } },
-      })
+      const { error } = await supabase.auth.signUp({ email, password, options: { data: { username } } })
       if (error) setMessage(error.message)
       else setMessage('Kayıt başarılı! Giriş yapabilirsin.')
     }
@@ -31,68 +26,78 @@ export default function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="bg-gray-900 p-8 rounded-2xl w-full max-w-md border border-gray-800">
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-2">⚽</div>
-          <h1 className="text-2xl font-bold text-white">WC 2026 Tahmin</h1>
-          <p className="text-gray-400 text-sm mt-1">Dünya Kupası tahmin oyunu</p>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-theme">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="text-center mb-10">
+          <div className="text-5xl mb-3">🏆</div>
+          <h1 className="text-2xl font-black tracking-tight" style={{ color: 'var(--text)' }}>WC 2026 Tahmin</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Dünya Kupası tahmin oyunu</p>
         </div>
 
-        <div className="flex mb-6 bg-gray-800 rounded-lg p-1">
-          <button
-            onClick={() => setIsLogin(true)}
-            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${isLogin ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
-          >
-            Giriş Yap
-          </button>
-          <button
-            onClick={() => setIsLogin(false)}
-            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${!isLogin ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'}`}
-          >
-            Kayıt Ol
-          </button>
-        </div>
+        {/* Kart */}
+        <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+          {/* Sekme */}
+          <div className="flex mb-6 rounded-xl p-1 gap-1" style={{ background: 'var(--bg-card2)' }}>
+            {['Giriş Yap', 'Kayıt Ol'].map((label, i) => (
+              <button
+                key={label}
+                onClick={() => setIsLogin(i === 0)}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
+                style={isLogin === (i === 0)
+                  ? { background: 'var(--green)', color: '#fff' }
+                  : { color: 'var(--text-muted)' }
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {!isLogin && (
+              <input
+                type="text"
+                placeholder="Kullanıcı adı"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+                style={{ background: 'var(--bg-card2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+              />
+            )}
             <input
-              type="text"
-              placeholder="Kullanıcı adı"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
+              type="email"
+              placeholder="E-posta"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               required
-              className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-green-500 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+              style={{ background: 'var(--bg-card2)', color: 'var(--text)', border: '1px solid var(--border)' }}
             />
-          )}
-          <input
-            type="email"
-            placeholder="E-posta"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-green-500 focus:outline-none"
-          />
-          <input
-            type="password"
-            placeholder="Şifre"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg border border-gray-700 focus:border-green-500 focus:outline-none"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Yükleniyor...' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
-          </button>
-        </form>
+            <input
+              type="password"
+              placeholder="Şifre"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+              style={{ background: 'var(--bg-card2)', color: 'var(--text)', border: '1px solid var(--border)' }}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
+              style={{ background: 'var(--green)', color: '#fff' }}
+            >
+              {loading ? 'Yükleniyor...' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+            </button>
+          </form>
 
-        {message && (
-          <p className="mt-4 text-center text-sm text-yellow-400">{message}</p>
-        )}
+          {message && (
+            <p className="mt-4 text-center text-sm" style={{ color: 'var(--gold)' }}>{message}</p>
+          )}
+        </div>
       </div>
     </div>
   )

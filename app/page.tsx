@@ -6,6 +6,7 @@ import Onboarding from '@/components/Onboarding'
 import MatchCard from '@/components/MatchCard'
 import LeagueSelector from '@/components/LeagueSelector'
 import MiniLeaderboard from '@/components/MiniLeaderboard'
+import ThemeToggle from '@/components/ThemeToggle'
 import Link from 'next/link'
 
 export default function Home() {
@@ -103,17 +104,21 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <header className="bg-gray-900 border-b border-gray-800 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⚽</span>
+    <div className="min-h-screen bg-theme text-theme">
+      {/* Header */}
+      <header className="sticky top-0 z-10 border-b border-theme" style={{ background: 'var(--bg-card)' }}>
+        <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="text-2xl">🏆</span>
             <div>
-              <h1 className="font-bold text-lg leading-none">WC 2026</h1>
-              <p className="text-gray-400 text-xs">Tahmin Oyunu</p>
+              <p className="font-black text-base leading-none tracking-tight" style={{ color: 'var(--text)' }}>WC 2026</p>
+              <p className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>Tahmin Oyunu</p>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
+          </Link>
+
+          {/* Sağ taraf */}
+          <div className="flex items-center gap-2">
             {profile && (
               <LeagueSelector
                 userId={user.id}
@@ -122,53 +127,82 @@ export default function Home() {
                 onSelect={(id) => setProfile((p: any) => ({ ...p, active_group_id: id }))}
               />
             )}
-            <Link href="/groups" className="text-gray-400 hover:text-white text-sm transition-colors hidden sm:block">
-              👥 Gruplar
+
+            <Link
+              href="/groups"
+              className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl border border-theme hover:border-theme2 transition-all"
+              style={{ color: 'var(--text-muted)', background: 'var(--bg-card2)' }}
+            >
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Gruplar
             </Link>
+
+            <ThemeToggle />
+
             <Link href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              {profile?.avatar && (
-                <img src={`/avatars/${profile.avatar}.svg`} alt="" className="w-9 h-9 rounded-full border border-gray-700" />
-              )}
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-semibold">{profile?.username}</p>
-                <p className="text-green-400 text-xs font-bold">{profile?.total_points ?? 0} puan</p>
+              {profile?.avatar
+                ? <img src={`/avatars/${profile.avatar}.svg`} alt="" className="w-9 h-9 rounded-full border border-theme" />
+                : <div className="w-9 h-9 rounded-full border border-theme" style={{ background: 'var(--bg-card2)' }} />
+              }
+              <div className="hidden sm:block text-right">
+                <p className="text-sm font-bold leading-none" style={{ color: 'var(--text)' }}>{profile?.username}</p>
+                <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--green)' }}>{profile?.total_points ?? 0} puan</p>
               </div>
             </Link>
-            <button onClick={signOut} className="text-gray-500 hover:text-white text-sm transition-colors">
-              Çıkış
+
+            <button
+              onClick={signOut}
+              title="Çıkış"
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-theme hover:border-theme2 transition-all"
+              style={{ background: 'var(--bg-card2)', color: 'var(--text-muted)' }}
+            >
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-7">
 
         {/* Lig seçimi uyarısı */}
         {needsLeagueSelection && (
-          <div className="bg-yellow-950 border border-yellow-700 rounded-2xl p-4 mb-6 flex items-center justify-between gap-4">
+          <div className="rounded-2xl p-4 mb-6 flex items-center justify-between gap-4 border"
+            style={{ background: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.3)' }}>
             <div>
-              <p className="text-yellow-300 font-semibold text-sm">Aktif lig seçilmedi</p>
-              <p className="text-yellow-600 text-xs mt-0.5">Tahmin yapabilmek için yukarıdan bir lig seçmelisin.</p>
+              <p className="font-semibold text-sm" style={{ color: 'var(--gold)' }}>Aktif lig seçilmedi</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Tahmin yapabilmek için yukarıdan bir lig seçmelisin.</p>
             </div>
-            <Link href="/groups" className="bg-yellow-700 hover:bg-yellow-600 text-white text-xs px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+            <Link href="/groups" className="text-xs font-semibold px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
+              style={{ background: 'var(--gold)', color: '#000' }}>
               Gruplara Git
             </Link>
           </div>
         )}
 
-        {/* Aktif ligin mini puan tablosu */}
-        {activeGroupId && (
-          <MiniLeaderboard groupId={activeGroupId} userId={user.id} />
-        )}
+        {/* Mini puan tablosu */}
+        {activeGroupId && <MiniLeaderboard groupId={activeGroupId} userId={user.id} />}
 
         {/* Tur sekmeleri */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-2 flex-wrap">
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex gap-1.5 flex-wrap">
             {([1, 2, 3, 'live'] as const).map(r => (
               <button
                 key={r}
                 onClick={() => setRoundFilter(r)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${roundFilter === r ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+                className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
+                style={roundFilter === r
+                  ? { background: 'var(--green)', color: '#fff' }
+                  : { background: 'var(--bg-card)', color: 'var(--text-muted)', border: '1px solid var(--border)' }
+                }
               >
                 {roundLabel(r)}
               </button>
@@ -177,27 +211,35 @@ export default function Home() {
           <button
             onClick={syncMatches}
             disabled={syncing}
-            className="text-xs text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-50"
+            className="text-xs font-medium px-3 py-2 rounded-xl border border-theme transition-all disabled:opacity-40 flex items-center gap-1.5"
+            style={{ color: 'var(--text-muted)', background: 'var(--bg-card)' }}
           >
-            {syncing ? '↻ Güncelleniyor...' : '↻ Güncelle'}
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+              className={syncing ? 'animate-spin' : ''}>
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            {syncing ? 'Güncelleniyor' : 'Güncelle'}
           </button>
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-gray-500">Yükleniyor...</div>
+          <div className="text-center py-24" style={{ color: 'var(--text-muted)' }}>Yükleniyor...</div>
         ) : filteredMatches.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 mb-4">
-              {roundFilter === 'live' ? 'Şu an canlı maç yok.' : `${roundFilter}. tur maçları henüz yüklenmedi.`}
+          <div className="text-center py-24">
+            <p className="mb-4" style={{ color: 'var(--text-muted)' }}>
+              {roundFilter === 'live' ? 'Şu an canlı maç yok.' : `${roundFilter}. tur maçları yüklenmedi.`}
             </p>
             {matches.length === 0 && (
-              <button onClick={syncMatches} className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-medium transition-colors">
+              <button onClick={syncMatches}
+                className="px-6 py-3 rounded-xl font-semibold transition-all"
+                style={{ background: 'var(--green)', color: '#fff' }}>
                 Maçları Yükle
               </button>
             )}
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {filteredMatches.map(match => (
               <MatchCard
                 key={match.id}

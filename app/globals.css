@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
+/* ── Dark theme (default) ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:        #080D1A;
+  --bg-card:   #0F1629;
+  --bg-card2:  #151E36;
+  --border:    #1E2D4A;
+  --border2:   #263550;
+  --text:      #F0F4FF;
+  --text-muted:#7A8BAD;
+  --green:     #10B981;
+  --green-dim: #0D9268;
+  --gold:      #F59E0B;
+  --red:       #EF4444;
+  --blue:      #3B82F6;
+}
+
+/* ── Light theme ── */
+.light {
+  --bg:        #EEF2F8;
+  --bg-card:   #FFFFFF;
+  --bg-card2:  #F3F7FF;
+  --border:    #D1DCF0;
+  --border2:   #B8CAEB;
+  --text:      #0F172A;
+  --text-muted:#5A6E8C;
+  --green:     #059669;
+  --green-dim: #047857;
+  --gold:      #D97706;
+  --red:       #DC2626;
+  --blue:      #2563EB;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+* { transition: background-color 0.2s, border-color 0.2s, color 0.1s; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg);
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Utility classes */
+.bg-theme        { background-color: var(--bg); }
+.bg-card         { background-color: var(--bg-card); }
+.bg-card2        { background-color: var(--bg-card2); }
+.border-theme    { border-color: var(--border); }
+.border-theme2   { border-color: var(--border2); }
+.text-theme      { color: var(--text); }
+.text-muted      { color: var(--text-muted); }
+.text-green      { color: var(--green); }
+.text-gold       { color: var(--gold); }
+.bg-green-accent { background-color: var(--green); }
+.bg-gold-accent  { background-color: var(--gold); }
+.border-green    { border-color: var(--green); }
