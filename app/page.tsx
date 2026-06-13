@@ -12,7 +12,7 @@ export default function Home() {
   const [matches, setMatches] = useState<any[]>([])
   const [predictions, setPredictions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'upcoming' | 'live' | 'finished'>('upcoming')
+  const [roundFilter, setRoundFilter] = useState<number | 'live'>(1)
   const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
@@ -74,7 +74,15 @@ export default function Home() {
     return <Onboarding userId={user.id} onComplete={setProfile} />
   }
 
-  const filteredMatches = matches.filter(m => m.status === filter)
+  const liveMatches = matches.filter(m => m.status === 'live')
+  const filteredMatches = roundFilter === 'live'
+    ? liveMatches
+    : matches.filter(m => m.matchday === roundFilter)
+
+  const roundLabel = (r: number | 'live') => {
+    if (r === 'live') return `🔴 Canlı${liveMatches.length > 0 ? ` (${liveMatches.length})` : ''}`
+    return `${r}. Tur`
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -112,14 +120,14 @@ export default function Home() {
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-2">
-            {(['upcoming', 'live', 'finished'] as const).map(f => (
+          <div className="flex gap-2 flex-wrap">
+            {([1, 2, 3, 'live'] as const).map(r => (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+                key={r}
+                onClick={() => setRoundFilter(r)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${roundFilter === r ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
               >
-                {f === 'upcoming' ? 'Yaklaşan' : f === 'live' ? '🔴 Canlı' : 'Biten'}
+                {roundLabel(r)}
               </button>
             ))}
           </div>
@@ -137,7 +145,7 @@ export default function Home() {
         ) : filteredMatches.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-500 mb-4">
-              {filter === 'upcoming' ? 'Yaklaşan maç yok.' : filter === 'live' ? 'Şu an canlı maç yok.' : 'Biten maç yok.'}
+              {roundFilter === 'live' ? 'Şu an canlı maç yok.' : `${roundFilter}. tur maçları henüz yüklenmedi.`}
             </p>
             {matches.length === 0 && (
               <button onClick={syncMatches} className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-medium transition-colors">

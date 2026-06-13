@@ -14,6 +14,7 @@ interface Match {
   away_score: number | null
   status: string
   stage: string
+  matchday?: number | null
 }
 
 interface Prediction {
@@ -64,13 +65,29 @@ export default function MatchCard({ match, prediction, userId }: Props) {
 
   return (
     <div
-      className={`bg-gray-900 border border-gray-800 rounded-2xl p-5 transition-colors ${isClickable ? 'hover:border-gray-600 cursor-pointer' : ''}`}
+      className={`relative bg-gray-900 border border-gray-800 rounded-2xl p-5 transition-colors overflow-hidden ${isClickable ? 'hover:border-gray-600 cursor-pointer' : ''}`}
       onClick={isClickable ? () => router.push(`/match/${match.id}`) : undefined}
     >
+      {/* Tur etiketi — şeffaf arka plan */}
+      {match.matchday && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+          <span className="text-[72px] font-black text-white opacity-[0.03] tracking-widest">
+            {match.matchday}. TUR
+          </span>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-4">
-        <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${statusBadge.color}`}>
-          {statusBadge.label}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${statusBadge.color}`}>
+            {statusBadge.label}
+          </span>
+          {match.matchday && (
+            <span className="text-xs px-2 py-1 rounded-full bg-gray-800 text-gray-400 font-medium">
+              {match.matchday}. Tur
+            </span>
+          )}
+        </div>
         <span className="text-gray-400 text-xs">
           {kickoff.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
         </span>
