@@ -26,6 +26,8 @@ export async function GET() {
         status: m.status === 'FINISHED' ? 'finished' : m.status === 'IN_PLAY' ? 'live' : 'upcoming',
         matchday: m.matchday,
         stage: m.stage,
+        goals: m.goals ?? [],
+        bookings: m.bookings ?? [],
       }))
 
     const { error } = await supabaseAdmin

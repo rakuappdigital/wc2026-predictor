@@ -19,7 +19,7 @@ export default function Leaderboard() {
       })
   }, [])
 
-  const medals = ['🥇', '🥈', '🥉']
+  const medals = ['👑', '🥈', '🥉']
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
