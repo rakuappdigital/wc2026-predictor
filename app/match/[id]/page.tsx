@@ -62,7 +62,7 @@ export default function MatchDetail() {
 
             const { data: preds } = await supabase
               .from('predictions')
-              .select('*, profiles(username)')
+              .select('*, profiles(username, avatar)')
               .eq('match_id', id)
               .in('user_id', memberIds)
 
@@ -230,14 +230,19 @@ export default function MatchDetail() {
                     key={pred.id}
                     className={`flex items-center justify-between p-4 rounded-xl border ${pred.user_id === userId ? 'bg-green-950 border-green-800' : 'bg-gray-900 border-gray-800'}`}
                   >
-                    <div>
-                      <p className="font-medium text-sm">
-                        {pred.profiles?.username}
-                        {pred.user_id === userId && <span className="text-green-400 text-xs ml-1">(sen)</span>}
-                      </p>
-                      {pred.groups?.length > 0 && (
-                        <p className="text-gray-600 text-xs">{pred.groups.join(', ')}</p>
+                    <div className="flex items-center gap-3">
+                      {pred.profiles?.avatar && (
+                        <img src={`/avatars/${pred.profiles.avatar}.svg`} alt="" className="w-9 h-9 rounded-full border border-gray-700 flex-shrink-0" />
                       )}
+                      <div>
+                        <p className="font-medium text-sm">
+                          {pred.profiles?.username}
+                          {pred.user_id === userId && <span className="text-green-400 text-xs ml-1">(sen)</span>}
+                        </p>
+                        {pred.groups?.length > 0 && (
+                          <p className="text-gray-600 text-xs">{pred.groups.join(', ')}</p>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="font-bold text-white text-lg">{pred.home_pred} - {pred.away_pred}</span>

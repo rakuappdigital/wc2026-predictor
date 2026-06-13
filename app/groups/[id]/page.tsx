@@ -34,7 +34,7 @@ export default function GroupDetail() {
   async function loadMembers() {
     const { data: memberData } = await supabase
       .from('group_members')
-      .select('profiles(id, username, total_points)')
+      .select('profiles(id, username, total_points, avatar)')
       .eq('group_id', id)
 
     const sorted = (memberData ?? [])
@@ -106,6 +106,9 @@ export default function GroupDetail() {
                 <div className="w-8 text-center text-lg">
                   {i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : <span className="text-gray-500 text-sm">{i + 1}</span>}
                 </div>
+                {member.avatar && (
+                  <img src={`/avatars/${member.avatar}.svg`} alt="" className="w-10 h-10 rounded-full border border-gray-700" />
+                )}
                 <div className="flex-1">
                   <p className="font-semibold">
                     {member.username}

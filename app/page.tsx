@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import AuthForm from '@/components/AuthForm'
+import Onboarding from '@/components/Onboarding'
 import MatchCard from '@/components/MatchCard'
 import Link from 'next/link'
 
@@ -69,6 +70,9 @@ export default function Home() {
   }
 
   if (!user) return <AuthForm />
+  if (user && profile && !profile.username_confirmed) {
+    return <Onboarding userId={user.id} onComplete={setProfile} />
+  }
 
   const filteredMatches = matches.filter(m => m.status === filter)
 
@@ -90,9 +94,14 @@ export default function Home() {
             <Link href="/leaderboard" className="text-gray-400 hover:text-white text-sm transition-colors">
               🏆 Sıralama
             </Link>
-            <div className="text-right">
-              <p className="text-sm font-semibold">{profile?.username}</p>
-              <p className="text-green-400 text-xs font-bold">{profile?.total_points ?? 0} puan</p>
+            <div className="flex items-center gap-2">
+              {profile?.avatar && (
+                <img src={`/avatars/${profile.avatar}.svg`} alt="" className="w-9 h-9 rounded-full border border-gray-700" />
+              )}
+              <div className="text-right">
+                <p className="text-sm font-semibold">{profile?.username}</p>
+                <p className="text-green-400 text-xs font-bold">{profile?.total_points ?? 0} puan</p>
+              </div>
             </div>
             <button onClick={signOut} className="text-gray-500 hover:text-white text-sm transition-colors">
               Çıkış

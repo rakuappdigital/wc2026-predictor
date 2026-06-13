@@ -45,6 +45,9 @@ export default function Leaderboard() {
                 <div className="w-8 text-center font-bold text-lg">
                   {i < 3 ? medals[i] : <span className="text-gray-500 text-sm">{i + 1}</span>}
                 </div>
+                {profile.avatar && (
+                  <img src={`/avatars/${profile.avatar}.svg`} alt="" className="w-10 h-10 rounded-full border border-gray-700" />
+                )}
                 <div className="flex-1">
                   <p className="font-semibold">{profile.username}</p>
                 </div>
