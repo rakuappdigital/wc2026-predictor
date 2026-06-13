@@ -28,9 +28,10 @@ interface Props {
   match: Match
   prediction?: Prediction
   userId?: string
+  canPredict?: boolean
 }
 
-export default function MatchCard({ match, prediction, userId }: Props) {
+export default function MatchCard({ match, prediction, userId, canPredict: leagueSelected = true }: Props) {
   const router = useRouter()
   const [homePred, setHomePred] = useState('')
   const [awayPred, setAwayPred] = useState('')
@@ -39,7 +40,7 @@ export default function MatchCard({ match, prediction, userId }: Props) {
 
   const kickoff = new Date(match.kickoff_time)
   const isPast = kickoff < new Date()
-  const canPredict = !isPast && userId && match.status === 'upcoming' && !prediction
+  const canPredict = !isPast && userId && match.status === 'upcoming' && !prediction && leagueSelected
 
   async function savePrediction() {
     if (!userId || homePred === '' || awayPred === '') return
