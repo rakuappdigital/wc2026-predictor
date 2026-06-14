@@ -4,7 +4,7 @@ const API_KEY = process.env.FOOTBALL_DATA_API_KEY!
 export async function fetchWC2026Matches() {
   const res = await fetch(`${BASE_URL}/competitions/WC/matches`, {
     headers: { 'X-Auth-Token': API_KEY },
-    next: { revalidate: 300 },
+    next: { revalidate: 60 },
   })
   if (!res.ok) throw new Error(`Football API error: ${res.status}`)
   return res.json()

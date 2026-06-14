@@ -23,7 +23,7 @@ export async function GET() {
         kickoff_time: m.utcDate,
         home_score: m.score?.fullTime?.home ?? null,
         away_score: m.score?.fullTime?.away ?? null,
-        status: m.status === 'FINISHED' ? 'finished' : m.status === 'IN_PLAY' ? 'live' : 'upcoming',
+        status: m.status === 'FINISHED' ? 'finished' : (['IN_PLAY', 'PAUSED', 'HALFTIME', 'EXTRA_TIME', 'PENALTY_SHOOTOUT'].includes(m.status)) ? 'live' : 'upcoming',
         matchday: m.matchday,
         stage: m.stage,
         goals: m.goals ?? [],

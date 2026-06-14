@@ -40,6 +40,14 @@ export default function Home() {
     })
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      await fetch('/api/sync-matches')
+      await fetchMatches()
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [])
+
   async function fetchProfile(userId: string) {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
     setProfile(data)
