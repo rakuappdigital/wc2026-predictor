@@ -36,7 +36,12 @@ export async function GET() {
 
     if (error) throw error
 
-    return NextResponse.json({ synced: rows.length })
+    const statusSummary = matches.reduce((acc: any, m: any) => {
+      acc[m.status] = (acc[m.status] || 0) + 1
+      return acc
+    }, {})
+
+    return NextResponse.json({ synced: rows.length, statuses: statusSummary })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
