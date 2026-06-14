@@ -41,7 +41,11 @@ export async function GET() {
       return acc
     }, {})
 
-    return NextResponse.json({ synced: rows.length, statuses: statusSummary })
+    const liveMatches = matches
+      .filter((m: any) => ['IN_PLAY', 'PAUSED', 'HALFTIME', 'EXTRA_TIME', 'PENALTY_SHOOTOUT'].includes(m.status))
+      .map((m: any) => ({ id: m.id, home: m.homeTeam?.name, away: m.awayTeam?.name, status: m.status, hasNames: !!(m.homeTeam?.name && m.awayTeam?.name) }))
+
+    return NextResponse.json({ synced: rows.length, statuses: statusSummary, liveMatches })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
